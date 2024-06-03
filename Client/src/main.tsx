@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./pages/App.tsx";
 import "./index.css";
 import Layout from "./layout/index.tsx";
-import Loan from "./pages/loan.tsx";
+import Loan from "./pages/Loan.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
