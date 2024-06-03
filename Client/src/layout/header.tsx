@@ -1,6 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import LogoSvartTekst from "../assets/LogoSvartTekst.png";
 import { redirectUrl } from "../utils/functions";
+import logout from "../assets/logout.svg";
 
 export const Header = () => {
   const token = localStorage.getItem("token");
@@ -12,18 +13,20 @@ export const Header = () => {
   }
 
   return (
-    <>
-      <div className="flex w-full h-16 p-2 ">
-        <img
-          src={LogoSvartTekst}
-          className="absolute h-16"
-          onClick={() => {
-            redirectUrl("/");
-          }}
-        />
-        <div className="flex flex-row w-full justify-center text-center">
+    <div>
+      <div className="flex w-full h-16 p-2 justify-between font-sans">
+        <div className="w-[33vw] cursor-pointer">
+          <img
+            src={LogoSvartTekst}
+            className="h-16 "
+            onClick={() => {
+              redirectUrl("/");
+            }}
+          />
+        </div>
+        <div className="flex flex-row w-[33vw] justify-between text-center text-4xl">
           <button
-            className="m-2"
+            className="my-2 relative hover-border-b"
             disabled={!token}
             onClick={() => {
               redirectUrl("/Lan");
@@ -32,7 +35,7 @@ export const Header = () => {
             Lån
           </button>
           <button
-            className="m-2"
+            className="my-2 relative hover-border-b"
             disabled={!token}
             onClick={() => {
               redirectUrl("/Levering");
@@ -41,30 +44,29 @@ export const Header = () => {
             Lever
           </button>
           <button
-            className="m-2"
+            className="my-2 relative hover-border-b"
             disabled={!token}
             onClick={() => {
-              redirectUrl("/Kontakt");
+              redirectUrl("/");
             }}
           >
             Kontakt
           </button>
         </div>
         {username ? (
-          <div>
+          <div
+            className="flex flex-row h-14 w-[33vw] justify-end text-center items-center text-2xl mr-2 cursor-pointer"
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+          >
             <p>{username}</p>
-            <button
-              onClick={() => {
-                localStorage.clear();
-                window.location.reload();
-              }}
-            >
-              Sign Out
-            </button>
+            <img src={logout} />
           </div>
         ) : (
           <button
-            className="w-24"
+            className="flex flex-row h-14 w-[33vw] justify-end text-center items-center text-2xl mr-2 cursor-pointer"
             onClick={() => {
               redirectUrl("/LoggInn");
             }}
@@ -74,6 +76,6 @@ export const Header = () => {
         )}
       </div>
       <hr className="w-full mt-3 bg-lightGreen h-1" />
-    </>
+    </div>
   );
 };

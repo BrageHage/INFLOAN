@@ -1,13 +1,23 @@
 import { useState, useEffect } from "react";
 import { getInventory, loanItem } from "../utils/functions";
 
+interface InventoryItem {
+  description: string;
+  rentedByUser: string | null;
+  specifications: string;
+  count: number;
+}
+
 const Loan = () => {
   const [inventory, setInventory] = useState([]);
   const [search, setSearch] = useState("");
-  const [countInventory, setCountInventory] = useState<{
-    [key: string]: number;
-  }>({});
+  const [countInventory, setCountInventory] = useState<
+    Record<string, InventoryItem>
+  >({});
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [showSpecifications, setShowSpecifications] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     setToken(localStorage.getItem("token"));
@@ -15,11 +25,18 @@ const Loan = () => {
       setInventory(data);
       const initialCountInventory = data.reduce(
         (
-          acc: { [key: string]: number },
-          curr: { description: string; rentedByUser: any }
+          acc: { [key: string]: { count: number; specifications: string } },
+          curr: {
+            description: string;
+            rentedByUser: any;
+            specifications: string;
+          }
         ) => {
           if (curr.rentedByUser === null)
-            acc[curr.description] = (acc[curr.description] || 0) + 1;
+            acc[curr.description] = {
+              count: (acc[curr.description]?.count || 0) + 1,
+              specifications: curr.specifications,
+            };
           return acc;
         },
         {}
@@ -36,38 +53,71 @@ const Loan = () => {
     return true;
   };
 
+  const toggleSpecifications = (description: string) => {
+    setShowSpecifications((prev) =>
+      prev === description ? null : description
+    );
+  };
+
   return (
-    <div>
-      <h1>Loans</h1>
-      <input
-        type="text"
-        placeholder="Search descriptions"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      {Object.entries(countInventory)
-        .filter(([description]) =>
-          description.toLowerCase().includes(search.toLowerCase())
-        )
-        .map(([description, count], index) => (
-          <p key={index}>
-            {description} - {count}
-            <button
-              className="ml-3 bg-darkGreen text-white rounded-sm w-8"
-              onClick={() => {
-                if (checkToken()) {
-                  loanItem(description);
-                  setCountInventory((prevCountInventory) => ({
-                    ...prevCountInventory,
-                    [description]: prevCountInventory[description] - 1,
-                  }));
-                }
-              }}
-            >
-              Lån
-            </button>
-          </p>
-        ))}
+    <div className="flex flex-col items-center w-full p-4">
+      <div className="w-full max-w-md">
+        <input
+          type="text"
+          placeholder="Search descriptions"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full p-2 mb-6 border border-gray-300 rounded-lg shadow-sm"
+        />
+      </div>
+      <div className="flex flex-wrap justify-center w-full max-w-4xl">
+        {Object.entries(countInventory)
+          .filter(([description]) =>
+            description.toLowerCase().includes(search.toLowerCase())
+          )
+          .map(([description, { count, specifications }], index) => (
+            <div key={index} className="w-full sm:w-1/2 p-2">
+              <div className="p-4 border border-gray-300 rounded-lg shadow-sm bg-white">
+                <div className="flex justify-between items-center">
+                  <div className="text-gray-800">
+                    <p className="font-semibold">{description}</p>
+                    <p className="text-gray-500">Antall igjen: {count}</p>
+                  </div>
+                  <button
+                    className="ml-3 mt-2 bg-green-700 text-white rounded-sm px-4 py-2"
+                    onClick={() => {
+                      if (checkToken()) {
+                        loanItem(description);
+                        setCountInventory((prevCountInventory) => ({
+                          ...prevCountInventory,
+                          [description]: {
+                            ...prevCountInventory[description],
+                            count: prevCountInventory[description].count - 1,
+                          },
+                        }));
+                      }
+                    }}
+                  >
+                    Lån
+                  </button>
+                </div>
+                <button
+                  className="text-blue-500 mt-2"
+                  onClick={() => toggleSpecifications(description)}
+                >
+                  {showSpecifications === description
+                    ? "Vis mindre informasjon"
+                    : "Vis mer informasjon"}
+                </button>
+                {showSpecifications === description && (
+                  <p className="text-gray-500 mt-2">
+                    Specifications: {specifications}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };
