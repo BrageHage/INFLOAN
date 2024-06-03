@@ -1,6 +1,13 @@
+import { useEffect } from "react";
 import { RediredctButton } from "../components/redirectButton";
 
 function App() {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token === null) {
+      window.location.href = "/LoggInn";
+    }
+  }, []);
   return (
     <div className="flex flex-col justify-center items-center w-full h-[32rem]">
       <h1 className="text-7xl my-10">INF Utlån av utstyr</h1>

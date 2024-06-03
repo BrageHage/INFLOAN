@@ -12,6 +12,8 @@ export const RegistrerLogin = () => {
       const status = await registrerUser(username, password);
       if (status.status === 200) {
         window.location.href = "/";
+      } else {
+        alert(`Error: ${status.statusText}`);
       }
     } else {
       alert("Passordene er ikke like");
@@ -26,6 +28,8 @@ export const RegistrerLogin = () => {
       const response = await login(username, password);
       if (response.status === 200) {
         window.location.href = "/";
+      } else {
+        alert(`Error: ${response.status} ${response.statusText}`);
       }
     }
   };
@@ -54,7 +58,7 @@ export const RegistrerLogin = () => {
         </div>
         <p
           onClick={() => {
-            setMakeUser(true);
+            setMakeUser(false);
           }}
         >
           Har du ikke bruker? Click her
@@ -80,7 +84,7 @@ export const RegistrerLogin = () => {
       </div>
       <p
         onClick={() => {
-          setMakeUser(false);
+          setMakeUser(true);
         }}
       >
         Har du allerede bruker? Click her

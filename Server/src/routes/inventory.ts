@@ -56,14 +56,79 @@ router.get("/get", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// {
-//     "Produsent": "Hewlett Packard",
-//     "Beskrivelse": "HP Envy Desktop TE01-4254",
-//     "Spesifikasjoner": "Intel Core i7-13700, 16GB RAM, 1TB SSD, Intel UHD Graphics 770, Windows 11 Home",
-//     "Innkj\u00f8psdato": "15.08.2023",
-//     "Innkj\u00f8pspris": 999.99,
-//     "Forventet levetid (i \u00e5r)": 5,
-//     "Kategori": "Datamaskiner"
-// },
+router.post(
+  "/loan",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { description, token } = req.body;
+
+      let index = parseInt(await redisClient.get(`inventoryJson_index`)) || 0;
+      let itemFound = false;
+      let username = await redisClient.hGet("tokens", token);
+
+      for (let i = 0; i < index; i++) {
+        let item = await redisClient.get(`inventory:${i}`);
+        const parsedItem = JSON.parse(item);
+
+        if (parsedItem.description === description) {
+          if (parsedItem.rentedByUser) {
+            continue;
+          }
+
+          parsedItem.rentedByUser = username;
+          await redisClient.set(`inventory:${i}`, JSON.stringify(parsedItem));
+          itemFound = true;
+          break;
+        }
+      }
+
+      if (!itemFound) {
+        res.status(400).json({ message: "Item does not exist" });
+        return;
+      }
+
+      res.status(200).json({ message: "Item rented successfully" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+router.post(
+  "/return",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { description, token } = req.body;
+
+      let index = parseInt(await redisClient.get(`inventoryJson_index`)) || 0;
+      let itemFound = false;
+      let username = await redisClient.hGet("tokens", token);
+
+      for (let i = 0; i < index; i++) {
+        let item = await redisClient.get(`inventory:${i}`);
+        const parsedItem = JSON.parse(item);
+
+        if (parsedItem.description === description) {
+          if (parsedItem.rentedByUser !== username) {
+            continue;
+          }
+
+          parsedItem.rentedByUser = null;
+          await redisClient.set(`inventory:${i}`, JSON.stringify(parsedItem));
+          itemFound = true;
+          break;
+        }
+      }
+
+      if (!itemFound) {
+        res.status(400).json({ message: "Item does not exist" });
+        return;
+      }
+
+      res.status(200).json({ message: "Item returned successfully" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 export default router;

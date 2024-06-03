@@ -1,5 +1,7 @@
 import inventoryJson from "../../public/inventoryData.json";
 
+const token = localStorage.getItem("token");
+
 const getInventory = async () => {
   const response = await fetch("http://localhost:3000/api/v1/inventory/get");
   const inventory = await response.json();
@@ -50,6 +52,37 @@ const login = async (username: string, password: string) => {
     },
     body: JSON.stringify({ username, password }),
   });
+
+  const data = await response.json();
+  const token = data.token;
+  localStorage.setItem("token", token);
+
+  return response;
+};
+
+//This function should handle the loan of an item, it should take the username and put it in the rentedByUser field of the item
+const loanItem = async (description: string) => {
+  const response = await fetch("http://localhost:3000/api/v1/inventory/loan", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ description, token }),
+  });
+  return response;
+};
+
+const returnItem = async (description: string) => {
+  const response = await fetch(
+    "http://localhost:3000/api/v1/inventory/return",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ description, token }),
+    }
+  );
   return response;
 };
 
@@ -57,4 +90,12 @@ const redirectUrl = (url: string) => {
   window.location.href = url;
 };
 
-export { getInventory, updateInventory, redirectUrl, registrerUser, login };
+export {
+  getInventory,
+  updateInventory,
+  redirectUrl,
+  registrerUser,
+  login,
+  loanItem,
+  returnItem,
+};

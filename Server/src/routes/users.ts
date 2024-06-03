@@ -30,10 +30,10 @@ router.post(
         res.status(400).json({ message: "Incorrect password" });
         return;
       }
+      const token = await generate_jwt(username);
 
-      res
-        .status(200)
-        .json({ message: "Logged in", token: await generate_jwt(username) });
+      await redisClient.hSet("tokens", token, username);
+      res.status(200).json({ message: "Logged in", token, username: username });
     } catch (err) {
       next(err);
     }
@@ -56,7 +56,7 @@ router.post(
         res.status(400).json({ message: "User already exists" });
         return;
       }
-
+      let token: string = "";
       const hashedPassword = await hashPassword(password);
 
       await redisClient.hSet("users", username, hashedPassword);
