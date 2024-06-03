@@ -17,6 +17,9 @@ export const Levering = () => {
   const username = decoded?.username;
 
   useEffect(() => {
+    if (!token) {
+      window.location.href = "/LoggInn";
+    }
     getInventory().then((data: InventoryItem[]) => {
       setInventory(data);
       console.log(inventory);
@@ -26,15 +29,19 @@ export const Levering = () => {
       setUserObjects(userFilteredObjects);
     });
   }, [username]);
-
   return (
-    <div className="flex flex-col justify-center items-center w-full h-[32rem]">
-      <h1 className="text-7xl my-10">Innlevering</h1>
-      <div className="flex flex-col gap-4">
+    <div className="flex flex-col items-center w-full h-screen p-4">
+      <h1 className="text-4xl font-bold my-10">Innlevering</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-4xl">
         {userObjects.length > 0 ? (
           userObjects.map((object) => (
-            <div key={object.id} className="flex flex-row gap-4">
-              <p>{object.description}</p>
+            <div
+              key={object.id}
+              className="flex justify-between items-center p-4 border border-gray-300 rounded-lg shadow-sm bg-white"
+            >
+              <p className="text-gray-800 font-semibold">
+                {object.description}
+              </p>
               <button
                 onClick={() => {
                   returnItem(object.description);
@@ -43,14 +50,14 @@ export const Levering = () => {
                   );
                   setUserObjects(newUserObjects);
                 }}
-                className="bg-darkGreen text-white rounded-sm w-8"
+                className="ml-3 mt-2 bg-red-700 text-white rounded-sm px-4 py-2"
               >
-                Return
+                Returner
               </button>
             </div>
           ))
         ) : (
-          <p>Du har ingen ting å levere</p>
+          <p className="text-gray-500">Du har ingen ting å levere</p>
         )}
       </div>
     </div>

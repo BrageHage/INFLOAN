@@ -11,44 +11,24 @@ export const RediredctButton: React.FC<RedirectButtonProps> = ({
   title,
   size,
 }) => {
-  switch (size) {
-    case "sm":
-      return (
-        <div className="">
-          <button
-            onClick={() => {
-              redirectUrl(url);
-            }}
-            className=""
-          >
-            {title}
-          </button>
-        </div>
-      );
-    case "md":
-      return (
-        <div className="">
-          <button
-            onClick={() => {
-              redirectUrl(url);
-            }}
-          >
-            {title}
-          </button>
-        </div>
-      );
-    case "lg":
-      return (
-        <div className="w-48 bg-darkGreen h-48 rounded-md text-white border-darkGreen border-4 flex justify-center text-4xl hover:bg-white hover:text-darkGreen">
-          <button
-            onClick={() => {
-              redirectUrl(url);
-            }}
-            className="h-48 w-48"
-          >
-            {title}
-          </button>
-        </div>
-      );
-  }
+  const buttonStyles = {
+    sm: "w-24 h-24 text-lg",
+    md: "w-36 h-36 text-2xl",
+    lg: "w-48 h-48 text-4xl",
+  };
+
+  return (
+    <div
+      className={`bg-green-700 rounded-md text-white border-green-700 border-4 flex justify-center items-center hover:bg-white hover:text-green-700 ${buttonStyles[size]}`}
+    >
+      <button
+        onClick={() => {
+          redirectUrl(url);
+        }}
+        className={`h-full w-full ${buttonStyles[size]}`}
+      >
+        {title}
+      </button>
+    </div>
+  );
 };

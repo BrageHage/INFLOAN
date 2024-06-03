@@ -9,86 +9,112 @@ export const RegistrerLogin = () => {
 
   const handleRegister = async () => {
     if (password === repeatPassword && password !== "" && username !== "") {
-      const status = await registrerUser(username, password);
-      if (status.status === 200) {
-        window.location.href = "/";
-      } else {
-        alert(`Error: ${status.statusText}`);
+      try {
+        const status = await registrerUser(username, password);
+        if (status.status === 200 || status.status === 201) {
+          window.location.reload(); // Last inn siden på nytt etter vellykket registrering
+        } else {
+          console.error(`Error: ${status.statusText}`);
+        }
+      } catch (error) {
+        console.error("An error occurred during registration.");
       }
     } else {
-      alert("Passordene er ikke like");
+      console.error("Passordene er ikke like");
     }
   };
 
   const handleLogin = async () => {
     if (username === "" || password === "") {
-      alert("Fyll ut alle feltene");
+      console.error("Fyll ut alle feltene");
       return;
     } else {
-      const response = await login(username, password);
-      if (response.status === 200) {
-        window.location.href = "/";
-      } else {
-        alert(`Error: ${response.status} ${response.statusText}`);
+      try {
+        const response = await login(username, password);
+        if (response.status === 200 || response.status === 201) {
+          window.location.href = "/";
+        } else {
+          console.error(`Error: ${response.status} ${response.statusText}`);
+        }
+      } catch (error) {
+        console.error("An error occurred during login.");
       }
     }
   };
 
-  if (makeUser)
-    return (
-      <>
-        <div>
-          <h1>Regisrer deg her</h1>
-          <input
-            type="text"
-            placeholder="Brukernavn"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Passord"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Gjenta passord"
-            onChange={(e) => setRepeatPassword(e.target.value)}
-          />
-          <button onClick={handleRegister}>Send inn</button>
-        </div>
-        <p
-          onClick={() => {
-            setMakeUser(false);
-          }}
-        >
-          Har du ikke bruker? Click her
-        </p>
-      </>
-    );
-
   return (
-    <>
-      <div>
-        <h1>Logg inn her</h1>
-        <input
-          type="text"
-          placeholder="Brukernavn"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Passord"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={handleLogin}>Send inn</button>
-      </div>
-      <p
-        onClick={() => {
-          setMakeUser(true);
-        }}
-      >
-        Har du allerede bruker? Click her
-      </p>
-    </>
+    <div className="flex flex-col items-center w-full h-[60vh] p-4 mt-8">
+      {makeUser ? (
+        <>
+          <div className="w-full max-w-md p-6 bg-white border border-gray-300 rounded-lg shadow-sm">
+            <h1 className="text-2xl font-bold mb-6">Registrer deg her</h1>
+            <input
+              type="text"
+              placeholder="Brukernavn"
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-2 mb-4 border border-gray-300 rounded-lg shadow-sm"
+            />
+            <input
+              type="password"
+              placeholder="Passord"
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 mb-4 border border-gray-300 rounded-lg shadow-sm"
+            />
+            <input
+              type="password"
+              placeholder="Gjenta passord"
+              onChange={(e) => setRepeatPassword(e.target.value)}
+              className="w-full p-2 mb-4 border border-gray-300 rounded-lg shadow-sm"
+            />
+            <button
+              onClick={handleRegister}
+              className="w-full bg-green-700 text-white rounded-lg py-2"
+            >
+              Send inn
+            </button>
+          </div>
+          <p
+            className="text-blue-500 mt-4 cursor-pointer"
+            onClick={() => {
+              setMakeUser(false);
+            }}
+          >
+            Har du allerede bruker? Klikk her
+          </p>
+        </>
+      ) : (
+        <>
+          <div className="w-full max-w-md p-6 bg-white border border-gray-300 rounded-lg shadow-sm">
+            <h1 className="text-2xl font-bold mb-6">Logg inn her</h1>
+            <input
+              type="text"
+              placeholder="Brukernavn"
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-2 mb-4 border border-gray-300 rounded-lg shadow-sm"
+            />
+            <input
+              type="password"
+              placeholder="Passord"
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 mb-4 border border-gray-300 rounded-lg shadow-sm"
+            />
+            <button
+              onClick={handleLogin}
+              className="w-full bg-green-700 text-white rounded-lg py-2"
+            >
+              Send inn
+            </button>
+          </div>
+          <p
+            className="text-blue-500 mt-4 cursor-pointer"
+            onClick={() => {
+              setMakeUser(true);
+            }}
+          >
+            Har du ikke bruker? Klikk her
+          </p>
+        </>
+      )}
+    </div>
   );
 };

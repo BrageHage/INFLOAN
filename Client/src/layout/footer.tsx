@@ -1,9 +1,9 @@
 export const Footer = () => {
   return (
-    <div className="bg-darkGreen text-white py-10 mt-[24rem]">
-      <div className="container mx-auto">
+    <div className="bg-darkGreen text-white py-10">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
+          <div className="ml-3 md:ml-0">
             <h2 className="text-lg font-semibold mb-2">Kontakt oss</h2>
             <hr className="border-t border-gray-300 mb-4" />
             <div className="mb-4">
@@ -27,7 +27,7 @@ export const Footer = () => {
             </p>
           </div>
 
-          <div>
+          <div className="hidden md:block ml-4 md:ml-0">
             <h2 className="text-lg font-semibold mb-2">Postadresse</h2>
             <hr className="border-t border-gray-300 mb-4" />
             <p>Innlandet fylkeskommune</p>
@@ -42,7 +42,7 @@ export const Footer = () => {
             </div>
           </div>
 
-          <div>
+          <div className="hidden md:block md:ml-0">
             <h2 className="text-lg font-semibold mb-2">Her finner du oss</h2>
             <hr className="border-t border-gray-300 mb-4" />
             <div className="mb-4">
@@ -58,7 +58,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-8 md:ml-0">
           <h2 className="text-lg font-semibold mb-2">Følg oss</h2>
           <hr className="border-t border-gray-300 mb-4" />
           <div className="flex space-x-4 mb-4">

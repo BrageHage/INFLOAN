@@ -8,10 +8,13 @@ function App() {
       window.location.href = "/LoggInn";
     }
   }, []);
+
   return (
-    <div className="flex flex-col justify-center items-center w-full h-[32rem]">
-      <h1 className="text-7xl my-10">INF Utlån av utstyr</h1>
-      <div className="flex flex-row gap-24 mt-20">
+    <div className="flex flex-col justify-start items-center w-full h-screen bg-gray-100 mt-10">
+      <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold my-5 text-gray-800">
+        INF Utlån av utstyr
+      </h1>
+      <div className="flex flex-col md:flex-row gap-8 mt-5">
         <RediredctButton url="/Lan" title="Lån" size="lg" />
         <RediredctButton url="/Levering" title="Lever" size="lg" />
       </div>

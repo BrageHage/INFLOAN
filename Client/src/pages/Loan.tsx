@@ -22,7 +22,7 @@ const Loan = () => {
   useEffect(() => {
     setToken(localStorage.getItem("token"));
     getInventory().then((data) => {
-      setInventory(data);
+      setInventory(inventory);
       const initialCountInventory = data.reduce(
         (
           acc: { [key: string]: { count: number; specifications: string } },
@@ -61,6 +61,7 @@ const Loan = () => {
 
   return (
     <div className="flex flex-col items-center w-full p-4">
+      <h1 className="text-4xl font-bold my-10">Utleie</h1>
       <div className="w-full max-w-md">
         <input
           type="text"
@@ -84,9 +85,11 @@ const Loan = () => {
                     <p className="text-gray-500">Antall igjen: {count}</p>
                   </div>
                   <button
-                    className="ml-3 mt-2 bg-green-700 text-white rounded-sm px-4 py-2"
+                    className={`ml-3 mt-2 ${
+                      count === 0 ? "bg-red-700" : "bg-green-700"
+                    } text-white rounded-sm px-4 py-2`}
                     onClick={() => {
-                      if (checkToken()) {
+                      if (checkToken() && count > 0) {
                         loanItem(description);
                         setCountInventory((prevCountInventory) => ({
                           ...prevCountInventory,
@@ -97,8 +100,9 @@ const Loan = () => {
                         }));
                       }
                     }}
+                    disabled={count === 0}
                   >
-                    Lån
+                    {count === 0 ? "Utlånt" : "Lån"}
                   </button>
                 </div>
                 <button
@@ -111,7 +115,7 @@ const Loan = () => {
                 </button>
                 {showSpecifications === description && (
                   <p className="text-gray-500 mt-2">
-                    Specifications: {specifications}
+                    Spesifikasjoner: {specifications}
                   </p>
                 )}
               </div>
