@@ -60,7 +60,7 @@ const Loan = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full p-4">
+    <div className="flex flex-col items-center w-full h-screen p-4">
       <h1 className="text-4xl font-bold my-10">Utleie</h1>
       <div className="w-full max-w-md">
         <input
