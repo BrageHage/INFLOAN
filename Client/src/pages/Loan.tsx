@@ -28,11 +28,6 @@ const Loan = () => {
     });
   }, []);
 
-  const filteredInventory = inventory.filter(
-    (item: { description: string; rentedByUser: any }) =>
-      item.description.toLowerCase().includes(search.toLowerCase())
-  );
-
   const checkToken = () => {
     if (token === null) {
       alert("You need to be logged in to loan items");
