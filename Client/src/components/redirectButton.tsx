@@ -11,7 +11,7 @@ export const RediredctButton: React.FC<RedirectButtonProps> = ({
   title,
   size,
 }) => {
-  const buttonStyles = {
+  const buttonStyles: { [key: string]: string } = {
     sm: "w-24 h-24 text-lg",
     md: "w-36 h-36 text-2xl",
     lg: "w-48 h-48 text-4xl",
