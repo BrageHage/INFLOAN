@@ -1,3 +1,5 @@
+import { redirectUrl } from "../utils/functions";
+
 type RedirectButtonProps = {
   url: string;
   title: string;
@@ -13,7 +15,12 @@ export const RediredctButton: React.FC<RedirectButtonProps> = ({
     case "sm":
       return (
         <div className="">
-          <button onClick={() => (window.location.href = url)} className="">
+          <button
+            onClick={() => {
+              redirectUrl(url);
+            }}
+            className=""
+          >
             {title}
           </button>
         </div>
@@ -21,14 +28,22 @@ export const RediredctButton: React.FC<RedirectButtonProps> = ({
     case "md":
       return (
         <div className="">
-          <button onClick={() => (window.location.href = url)}>{title}</button>
+          <button
+            onClick={() => {
+              redirectUrl(url);
+            }}
+          >
+            {title}
+          </button>
         </div>
       );
     case "lg":
       return (
         <div className="w-48 bg-darkGreen h-48 rounded-md text-white border-darkGreen border-4 flex justify-center text-4xl hover:bg-white hover:text-darkGreen">
           <button
-            onClick={() => (window.location.href = url)}
+            onClick={() => {
+              redirectUrl(url);
+            }}
             className="h-48 w-48"
           >
             {title}

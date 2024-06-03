@@ -7,11 +7,11 @@ router.post(
   "/upload",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { inventory_data } = req.body;
-      console.log(inventory_data);
-      let index = parseInt(await redisClient.get(`inventory_data_index`)) || 0;
+      const { inventoryJson } = req.body;
+      console.log(inventoryJson);
+      let index = parseInt(await redisClient.get(`inventoryJson_index`)) || 0;
 
-      for (const item of inventory_data) {
+      for (const item of inventoryJson) {
         const englishItem = {
           manufacturer: item.Produsent,
           description: item.Beskrivelse,
@@ -20,6 +20,8 @@ router.post(
           purchasePrice: item.Innkjøpspris,
           expectedLifetime: item["Forventet levetid (i år)"],
           category: item.Kategori,
+          id: item.id,
+          rentedByUser: item.rentedByUser,
         };
 
         await redisClient.set(
@@ -29,7 +31,7 @@ router.post(
         index++;
       }
 
-      await redisClient.set(`inventory_data_index`, index.toString());
+      await redisClient.set(`inventoryJson_index`, index.toString());
 
       res.status(200).json({ message: "Inventory uploaded successfully" });
     } catch (err) {
