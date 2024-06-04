@@ -2,12 +2,12 @@ import { FcCheckmark } from "react-icons/fc";
 
 type ConfirmationComponentProps = {
   message: string;
-  position: number; // New prop to control the position
+  position?: number;
 };
 
 const ConfirmationComponent: React.FC<ConfirmationComponentProps> = ({
   message,
-  position,
+  position = 0,
 }) => {
   return (
     <div
