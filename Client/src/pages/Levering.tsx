@@ -45,7 +45,7 @@ export const Levering = () => {
   }, [confirmationMessages]);
 
   return (
-    <div className="flex flex-col items-center w-full h-screen p-4">
+    <div className="flex flex-col items-center w-full min-h-screen p-4">
       {confirmationMessages.map((message, index) => (
         <ConfirmationComponent
           key={message.id}
