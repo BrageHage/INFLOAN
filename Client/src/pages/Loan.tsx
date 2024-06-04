@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getInventory, loanItem } from "../utils/functions";
+import ConfirmationComponent from "../components/confirmationComponent";
 
 interface InventoryItem {
   description: string;
@@ -18,6 +19,9 @@ const Loan = () => {
   const [showSpecifications, setShowSpecifications] = useState<string | null>(
     null
   );
+  const [confirmationMessages, setConfirmationMessages] = useState<
+    { message: string; id: number }[]
+  >([]);
 
   useEffect(() => {
     setToken(localStorage.getItem("token"));
@@ -45,6 +49,16 @@ const Loan = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (confirmationMessages.length > 0) {
+      const timer = setTimeout(() => {
+        setConfirmationMessages((prevMessages) => prevMessages.slice(1));
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [confirmationMessages]);
+
   const checkToken = () => {
     if (token === null) {
       alert("You need to be logged in to loan items");
@@ -59,8 +73,32 @@ const Loan = () => {
     );
   };
 
+  const handleLoan = (description: string) => {
+    if (checkToken() && countInventory[description].count > 0) {
+      loanItem(description);
+      setConfirmationMessages((prevMessages) => [
+        ...prevMessages,
+        { message: `${description} er nå lånt!`, id: Date.now() },
+      ]);
+      setCountInventory((prevCountInventory) => ({
+        ...prevCountInventory,
+        [description]: {
+          ...prevCountInventory[description],
+          count: prevCountInventory[description].count - 1,
+        },
+      }));
+    }
+  };
+
   return (
     <div className="flex flex-col items-center w-full min-h-screen p-4">
+      {confirmationMessages.map((message, index) => (
+        <ConfirmationComponent
+          key={message.id}
+          message={message.message}
+          position={index}
+        />
+      ))}
       <h1 className="text-4xl font-bold my-10">Utleie</h1>
       <div className="w-full max-w-md">
         <input
@@ -88,18 +126,7 @@ const Loan = () => {
                     className={`ml-3 mt-2 ${
                       count === 0 ? "bg-red-700" : "bg-green-700"
                     } text-white rounded-sm px-4 py-2`}
-                    onClick={() => {
-                      if (checkToken() && count > 0) {
-                        loanItem(description);
-                        setCountInventory((prevCountInventory) => ({
-                          ...prevCountInventory,
-                          [description]: {
-                            ...prevCountInventory[description],
-                            count: prevCountInventory[description].count - 1,
-                          },
-                        }));
-                      }
-                    }}
+                    onClick={() => handleLoan(description)}
                     disabled={count === 0}
                   >
                     {count === 0 ? "Utlånt" : "Lån"}
