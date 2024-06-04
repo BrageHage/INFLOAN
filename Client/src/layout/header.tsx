@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import LogoSvartTekst from "../assets/LogoSvartTekst.png";
+import LogoSvartTekst from "../assets/hamar-katedralskole.svg";
 import { redirectUrl } from "../utils/functions";
 import logout from "../assets/logout.svg";
 
