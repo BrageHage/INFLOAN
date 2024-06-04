@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { login, registrerUser } from "../utils/functions";
 import ConfirmationComponent from "../components/confirmationComponent";
 
