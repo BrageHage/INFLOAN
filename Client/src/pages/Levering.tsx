@@ -6,33 +6,46 @@ import ConfirmationComponent from "../components/confirmationComponent";
 interface InventoryItem {
   id: string;
   description: string;
-  rentedByUser: string;
+  rentedByUser: string | null;
 }
 
 export const Levering = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [userObjects, setUserObjects] = useState<InventoryItem[]>([]);
-
-  const token = localStorage.getItem("token");
-  const decoded = jwtDecode(token ?? "") as { username: string };
-  const username = decoded?.username;
   const [confirmationMessages, setConfirmationMessages] = useState<
     { message: string; id: number }[]
   >([]);
 
+  const token = localStorage.getItem("token");
+  let username = "";
+
+  if (token) {
+    const decoded = jwtDecode<{ username: string }>(token);
+    username = decoded.username;
+  }
+
   useEffect(() => {
     if (!token) {
       window.location.href = "/LoggInn";
+      return;
     }
-    getInventory().then((data: InventoryItem[]) => {
-      setInventory(data);
-      console.log(inventory);
-      let userFilteredObjects = data.filter(
-        (object) => object.rentedByUser === username
-      );
-      setUserObjects(userFilteredObjects);
-    });
-  }, [username]);
+    console.log("fetching inventory", inventory);
+    const fetchInventory = async () => {
+      try {
+        const data = await getInventory();
+        setInventory(data);
+        const userFilteredObjects = data.filter(
+          (object: { rentedByUser: string }) =>
+            object && object.rentedByUser === username
+        );
+        setUserObjects(userFilteredObjects);
+      } catch (error) {
+        console.error("Failed to fetch inventory:", error);
+      }
+    };
+
+    fetchInventory();
+  }, [token, username]);
 
   useEffect(() => {
     if (confirmationMessages.length > 0) {
@@ -43,6 +56,24 @@ export const Levering = () => {
       return () => clearTimeout(timer);
     }
   }, [confirmationMessages]);
+
+  const handleReturn = async (object: InventoryItem) => {
+    try {
+      await returnItem(object.description);
+      setConfirmationMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          message: `${object.description} er nå levert!`,
+          id: Date.now(),
+        },
+      ]);
+      setUserObjects((prevUserObjects) =>
+        prevUserObjects.filter((userObject) => userObject.id !== object.id)
+      );
+    } catch (error) {
+      console.error("Failed to return item:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen p-4">
@@ -65,20 +96,7 @@ export const Levering = () => {
                 {object.description}
               </p>
               <button
-                onClick={() => {
-                  returnItem(object.description);
-                  setConfirmationMessages((prevMessages) => [
-                    ...prevMessages,
-                    {
-                      message: `${object.description} er nå levert!`,
-                      id: Date.now(),
-                    },
-                  ]);
-                  const newUserObjects = userObjects.filter(
-                    (userObject) => userObject.id !== object.id
-                  );
-                  setUserObjects(newUserObjects);
-                }}
+                onClick={() => handleReturn(object)}
                 className="ml-3 mt-2 bg-red-700 text-white rounded-sm px-4 py-2"
               >
                 Returner

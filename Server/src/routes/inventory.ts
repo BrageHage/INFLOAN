@@ -179,26 +179,28 @@ router.post(
 
       for (let i = 0; i < index; i++) {
         let item = await redisClient.get(`inventory:${i}`);
-        const parsedItem = JSON.parse(item);
 
-        if (parsedItem.description === description) {
-          if (parsedItem.rentedByUser !== username) {
-            continue;
+        if (item) {
+          const parsedItem = JSON.parse(item);
+
+          if (parsedItem.description === description) {
+            if (parsedItem.rentedByUser !== username) {
+              continue;
+            }
+
+            parsedItem.rentedByUser = null;
+            await redisClient.set(`inventory:${i}`, JSON.stringify(parsedItem));
+            itemFound = true;
+            break;
           }
-
-          parsedItem.rentedByUser = null;
-          await redisClient.set(`inventory:${i}`, JSON.stringify(parsedItem));
-          itemFound = true;
-          break;
         }
       }
 
       if (!itemFound) {
         res.status(400).json({ message: "Item does not exist" });
-        return;
+      } else {
+        res.status(200).json({ message: "Item returned successfully" });
       }
-
-      res.status(200).json({ message: "Item returned successfully" });
     } catch (err) {
       next(err);
     }

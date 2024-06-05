@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { addItem, getInventory } from "../utils/functions";
+import { addItem } from "../utils/functions";
 import ConfirmationComponent from "../components/confirmationComponent";
 
 const AddItem = () => {
@@ -16,16 +16,7 @@ const AddItem = () => {
   const [confirmationMessages, setConfirmationMessages] = useState<
     { message: string; id: number }[]
   >([]);
-
-  useEffect(() => {
-    if (confirmationMessages.length > 0) {
-      const timer = setTimeout(() => {
-        setConfirmationMessages((prevMessages) => prevMessages.slice(1));
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [confirmationMessages]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -33,6 +24,16 @@ const AddItem = () => {
       window.location.href = "/LoggInn";
     }
   }, []);
+
+  useEffect(() => {
+    if (confirmationMessages.length >= 0) {
+      const timer = setTimeout(() => {
+        setConfirmationMessages((prevMessages) => prevMessages.slice(1));
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [confirmationMessages]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,6 +62,11 @@ const AddItem = () => {
         Kategori: "",
         rentedByUser: null,
       });
+      setShowConfirmation(true);
+      const timer = setTimeout(() => {
+        setShowConfirmation(false);
+      }, 3000);
+      return () => clearTimeout(timer);
     } catch (error) {
       console.error("Failed to add item:", error);
     }
@@ -68,6 +74,9 @@ const AddItem = () => {
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen p-4">
+      {showConfirmation && (
+        <ConfirmationComponent message="Enheten er lagt til!" />
+      )}
       {confirmationMessages.map((message) => (
         <ConfirmationComponent
           key={message.id}

@@ -116,6 +116,10 @@ const Loan = () => {
   const handleDelete = async (description: string) => {
     try {
       await deleteItems(description);
+      setConfirmationMessages((prevMessages) => [
+        ...prevMessages,
+        { message: `${description} er nå slettet!`, id: Date.now() },
+      ]);
       fetchInventory();
     } catch (error) {
       console.error("Failed to delete item:", error);
