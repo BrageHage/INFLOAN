@@ -3,22 +3,19 @@ import inventoryJson from "../../public/inventoryData.json";
 const token = localStorage.getItem("token");
 
 const getInventory = async () => {
-  const response = await fetch("http://localhost:3000/api/v1/inventory/get");
+  const response = await fetch("http://10.0.0.190/api/v1/inventory/get");
   const inventory = await response.json();
   return inventory;
 };
 
 const deleteItems = async (description: string) => {
-  const response = await fetch(
-    "http://localhost:3000/api/v1/inventory/delete",
-    {
-      method: "delete",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ description, token }),
-    }
-  );
+  const response = await fetch("http://10.0.0.190/api/v1/inventory/delete", {
+    method: "delete",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ description, token }),
+  });
   return response;
 };
 
@@ -31,21 +28,18 @@ const updateInventory = async () => {
     };
   });
 
-  const response = await fetch(
-    "http://localhost:3000/api/v1/inventory/upload",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ inventoryJson: updatedInventory }),
-    }
-  );
+  const response = await fetch("http://10.0.0.190/api/v1/inventory/upload", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ inventoryJson: updatedInventory }),
+  });
   return response;
 };
 
 const addItem = async (item: any, token: string) => {
-  const response = await fetch("http://localhost:3000/api/v1/inventory/add", {
+  const response = await fetch("http://10.0.0.190/api/v1/inventory/add", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,21 +50,18 @@ const addItem = async (item: any, token: string) => {
 };
 
 const registrerUser = async (username: string, password: string) => {
-  const response = await fetch(
-    "http://localhost:3000/api/v1/users/createuser",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    }
-  );
+  const response = await fetch("http://10.0.0.190/api/v1/users/createuser", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  });
   return response;
 };
 
 const login = async (username: string, password: string) => {
-  const response = await fetch("http://localhost:3000/api/v1/users/login", {
+  const response = await fetch("http://10.0.0.190/api/v1/users/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -86,7 +77,7 @@ const login = async (username: string, password: string) => {
 };
 
 const loanItem = async (description: string) => {
-  const response = await fetch("http://localhost:3000/api/v1/inventory/loan", {
+  const response = await fetch("http://10.0.0.190/api/v1/inventory/loan", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -97,16 +88,13 @@ const loanItem = async (description: string) => {
 };
 
 const returnItem = async (description: string) => {
-  const response = await fetch(
-    "http://localhost:3000/api/v1/inventory/return",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ description, token }),
-    }
-  );
+  const response = await fetch("http://10.0.0.190/api/v1/inventory/return", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ description, token }),
+  });
   return response;
 };
 
