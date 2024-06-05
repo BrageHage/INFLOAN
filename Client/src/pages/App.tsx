@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { RediredctButton } from "../components/redirectButton";
 import { jwtDecode } from "jwt-decode";
+import { updateInventory } from "../utils/functions";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -30,6 +31,14 @@ function App() {
         )}
         <RediredctButton url="/Levering" title="Lever" size="lg" />
       </div>
+      {username === "admin" && (
+        <button
+          onClick={updateInventory}
+          className="bg-green-700 w-30 h-30 text-white rounded-md mt-10 p-5"
+        >
+          Legg til demo data
+        </button>
+      )}
     </div>
   );
 }
