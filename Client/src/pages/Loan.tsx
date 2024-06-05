@@ -60,6 +60,13 @@ const Loan = () => {
   }, []);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/LoggInn";
+    }
+  }, []);
+
+  useEffect(() => {
     if (confirmationMessages.length > 0) {
       const timer = setTimeout(() => {
         setConfirmationMessages((prevMessages) => prevMessages.slice(1));

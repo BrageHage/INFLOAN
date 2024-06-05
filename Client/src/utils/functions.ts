@@ -44,6 +44,17 @@ const updateInventory = async () => {
   return response;
 };
 
+const addItem = async (item: any, token: string) => {
+  const response = await fetch("http://localhost:3000/api/v1/inventory/add", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ item, token }),
+  });
+  return response;
+};
+
 const registrerUser = async (username: string, password: string) => {
   const response = await fetch(
     "http://localhost:3000/api/v1/users/createuser",
@@ -112,4 +123,5 @@ export {
   loanItem,
   returnItem,
   deleteItems,
+  addItem,
 };

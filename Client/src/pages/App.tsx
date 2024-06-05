@@ -1,7 +1,16 @@
 import { useEffect } from "react";
 import { RediredctButton } from "../components/redirectButton";
+import { jwtDecode } from "jwt-decode";
 
 function App() {
+  const token = localStorage.getItem("token");
+  let username = null;
+
+  if (token) {
+    const decoded = jwtDecode<{ username: string }>(token);
+    username = decoded.username;
+  }
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token === null) {
@@ -16,6 +25,9 @@ function App() {
       </h1>
       <div className="flex flex-col md:flex-row gap-8 mt-5">
         <RediredctButton url="/Lan" title="Lån" size="lg" />
+        {username === "admin" && (
+          <RediredctButton url="/LeggTilEnhet" title="Legg til" size="lg" />
+        )}
         <RediredctButton url="/Levering" title="Lever" size="lg" />
       </div>
     </div>

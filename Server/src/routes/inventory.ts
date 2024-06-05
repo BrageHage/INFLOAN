@@ -92,6 +92,42 @@ router.delete(
   }
 );
 
+router.post("/add", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { item, token } = req.body;
+    console.log("Received token:", token);
+    let username = await redisClient.hGet("tokens", token);
+    console.log("Retrieved username from Redis:", username);
+
+    if (username !== "admin") {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const newItem = {
+      manufacturer: item.Produsent,
+      description: item.Beskrivelse,
+      specifications: item.Spesifikasjoner,
+      purchaseDate: item.Innkjøpsdato,
+      purchasePrice: item.Innkjøpspris,
+      expectedLifetime: item["Forventet levetid (i år)"],
+      category: item.Kategori,
+      id: item.id,
+      rentedByUser: item.rentedByUser,
+    };
+
+    let index = parseInt(await redisClient.get(`inventoryJson_index`)) || 0;
+
+    await redisClient.set(`inventory:${index}`, JSON.stringify(newItem));
+    index++;
+    await redisClient.set(`inventoryJson_index`, index.toString());
+
+    res.status(200).json({ message: "Item added successfully" });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post(
   "/loan",
   async (req: Request, res: Response, next: NextFunction) => {
