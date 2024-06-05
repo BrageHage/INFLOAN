@@ -8,6 +8,20 @@ const getInventory = async () => {
   return inventory;
 };
 
+const deleteItems = async (description: string) => {
+  const response = await fetch(
+    "http://localhost:3000/api/v1/inventory/delete",
+    {
+      method: "delete",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ description, token }),
+    }
+  );
+  return response;
+};
+
 const updateInventory = async () => {
   const updatedInventory = inventoryJson.map((item: any, index: number) => {
     return {
@@ -60,7 +74,6 @@ const login = async (username: string, password: string) => {
   return response;
 };
 
-//This function should handle the loan of an item, it should take the username and put it in the rentedByUser field of the item
 const loanItem = async (description: string) => {
   const response = await fetch("http://localhost:3000/api/v1/inventory/loan", {
     method: "POST",
@@ -98,4 +111,5 @@ export {
   login,
   loanItem,
   returnItem,
+  deleteItems,
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { getInventory, loanItem } from "../utils/functions";
+import { deleteItems, getInventory, loanItem } from "../utils/functions";
 import ConfirmationComponent from "../components/confirmationComponent";
+import { jwtDecode } from "jwt-decode";
 
 interface InventoryItem {
   description: string;
@@ -10,10 +11,10 @@ interface InventoryItem {
 }
 
 const Loan = () => {
-  const [inventory, setInventory] = useState([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [search, setSearch] = useState("");
   const [countInventory, setCountInventory] = useState<
-    Record<string, InventoryItem>
+    Record<string, { count: number; specifications: string }>
   >({});
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [showSpecifications, setShowSpecifications] = useState<string | null>(
@@ -22,11 +23,13 @@ const Loan = () => {
   const [confirmationMessages, setConfirmationMessages] = useState<
     { message: string; id: number }[]
   >([]);
+  let username = null;
 
-  useEffect(() => {
-    setToken(localStorage.getItem("token"));
-    getInventory().then((data) => {
-      setInventory(inventory);
+  const fetchInventory = async () => {
+    try {
+      const data = await getInventory();
+      setInventory(data);
+      console.log(inventory);
       const initialCountInventory = data.reduce(
         (
           acc: { [key: string]: { count: number; specifications: string } },
@@ -36,7 +39,7 @@ const Loan = () => {
             specifications: string;
           }
         ) => {
-          if (curr.rentedByUser === null)
+          if (curr && curr.rentedByUser === null)
             acc[curr.description] = {
               count: (acc[curr.description]?.count || 0) + 1,
               specifications: curr.specifications,
@@ -46,7 +49,14 @@ const Loan = () => {
         {}
       );
       setCountInventory(initialCountInventory);
-    });
+    } catch (error) {
+      console.error("Failed to fetch inventory:", error);
+    }
+  };
+
+  useEffect(() => {
+    setToken(localStorage.getItem("token"));
+    fetchInventory();
   }, []);
 
   useEffect(() => {
@@ -67,6 +77,11 @@ const Loan = () => {
     return true;
   };
 
+  if (token) {
+    const decoded = jwtDecode<{ username: string }>(token);
+    username = decoded.username;
+  }
+
   const toggleSpecifications = (description: string) => {
     setShowSpecifications((prev) =>
       prev === description ? null : description
@@ -74,19 +89,29 @@ const Loan = () => {
   };
 
   const handleLoan = (description: string) => {
-    if (checkToken() && countInventory[description].count > 0) {
-      loanItem(description);
-      setConfirmationMessages((prevMessages) => [
-        ...prevMessages,
-        { message: `${description} er nå lånt!`, id: Date.now() },
-      ]);
-      setCountInventory((prevCountInventory) => ({
-        ...prevCountInventory,
-        [description]: {
-          ...prevCountInventory[description],
-          count: prevCountInventory[description].count - 1,
-        },
-      }));
+    if (checkToken() && countInventory[description]?.count > 0) {
+      loanItem(description).then(() => {
+        setConfirmationMessages((prevMessages) => [
+          ...prevMessages,
+          { message: `${description} er nå lånt!`, id: Date.now() },
+        ]);
+        setCountInventory((prevCountInventory) => ({
+          ...prevCountInventory,
+          [description]: {
+            ...prevCountInventory[description],
+            count: prevCountInventory[description].count - 1,
+          },
+        }));
+      });
+    }
+  };
+
+  const handleDelete = async (description: string) => {
+    try {
+      await deleteItems(description);
+      fetchInventory();
+    } catch (error) {
+      console.error("Failed to delete item:", error);
     }
   };
 
@@ -122,15 +147,25 @@ const Loan = () => {
                     <p className="font-semibold">{description}</p>
                     <p className="text-gray-500">Antall igjen: {count}</p>
                   </div>
-                  <button
-                    className={`ml-3 mt-2 ${
-                      count === 0 ? "bg-red-700" : "bg-green-700"
-                    } text-white rounded-sm px-4 py-2`}
-                    onClick={() => handleLoan(description)}
-                    disabled={count === 0}
-                  >
-                    {count === 0 ? "Utlånt" : "Lån"}
-                  </button>
+                  <div className="flex justify-center flex-row gap-3">
+                    <button
+                      className={`ml-3 ${
+                        count === 0 ? "bg-red-700" : "bg-green-700"
+                      } text-white rounded-sm px-4 py-2`}
+                      onClick={() => handleLoan(description)}
+                      disabled={count === 0}
+                    >
+                      {count === 0 ? "Utlånt" : "Lån"}
+                    </button>
+                    {username === "admin" && (
+                      <button
+                        onClick={() => handleDelete(description)}
+                        className="text-white bg-red-600 hover:bg-red-700 rounded-sm px-4 py-2"
+                      >
+                        Slett
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <button
                   className="text-blue-500 mt-2"

@@ -56,6 +56,42 @@ router.get("/get", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+router.delete(
+  "/delete",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { description, token } = req.body;
+
+      let index = parseInt(await redisClient.get(`inventoryJson_index`)) || 0;
+      let itemFound = false;
+      let username = await redisClient.hGet("tokens", token);
+
+      for (let i = 0; i < index; i++) {
+        let item = await redisClient.get(`inventory:${i}`);
+
+        if (item) {
+          const parsedItem = JSON.parse(item);
+
+          if (parsedItem.description === description && username === "admin") {
+            await redisClient.del(`inventory:${i}`);
+            itemFound = true;
+            break;
+          }
+        }
+      }
+
+      if (!itemFound) {
+        res.status(400).json({ message: "Item does not exist" });
+        return;
+      }
+
+      res.status(200).json({ message: "Item deleted successfully" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 router.post(
   "/loan",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -70,15 +106,17 @@ router.post(
         let item = await redisClient.get(`inventory:${i}`);
         const parsedItem = JSON.parse(item);
 
-        if (parsedItem.description === description) {
-          if (parsedItem.rentedByUser) {
-            continue;
-          }
+        if (item) {
+          if (parsedItem.description === description) {
+            if (parsedItem.rentedByUser) {
+              continue;
+            }
 
-          parsedItem.rentedByUser = username;
-          await redisClient.set(`inventory:${i}`, JSON.stringify(parsedItem));
-          itemFound = true;
-          break;
+            parsedItem.rentedByUser = username;
+            await redisClient.set(`inventory:${i}`, JSON.stringify(parsedItem));
+            itemFound = true;
+            break;
+          }
         }
       }
 

@@ -9,6 +9,7 @@ const userRequireMiddleware = async (req, res, next) => {
     "users/createuser",
     "inventory/loan",
     "inventory/return",
+    "inventory/delete",
   ];
   console.log("User Connected", req.ip);
 
